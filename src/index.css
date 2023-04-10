@@ -90,9 +90,10 @@ hr.RampBreak--l {
   cursor: pointer;
 }
 
+/* Bug 1: Change the value of the 'position' property from 'fixed' to 'absolute'. 'Fixed' causes the dropdown menu to be positionn relatived to the broswer rather the ancestor element. */
 .RampInputSelect--dropdown-container {
   display: none;
-  position: fixed;
+  position: absolute;
   width: 100%;
   max-width: 700px;
   border: 1px solid var(--color-darker-shade);
