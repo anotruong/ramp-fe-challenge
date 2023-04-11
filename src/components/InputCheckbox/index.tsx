@@ -3,8 +3,12 @@ import { useRef } from "react"
 import { InputCheckboxComponent } from "./types"
 
 export const InputCheckbox: InputCheckboxComponent = ({ id, checked = false, disabled, onChange }) => {
-  // console.log(onChange)
   const { current: inputId } = useRef(`RampInputCheckbox-${id}`)
+  // console.log(`checked: ${checked}`)
+  // console.log(`disabled: ${disabled}`)
+
+
+// Resolved Bug 2: 'htmlFor' property was omitted from the label element. Omitting the property results in the label element from being assigend to an input.
 
   return (
     <div className="RampInputCheckbox--container" data-testid={inputId}>
@@ -13,6 +17,7 @@ export const InputCheckbox: InputCheckboxComponent = ({ id, checked = false, dis
           "RampInputCheckbox--label-checked": checked,
           "RampInputCheckbox--label-disabled": disabled,
         })}
+        htmlFor={inputId}
       />
       <input
         id={inputId}
@@ -20,10 +25,7 @@ export const InputCheckbox: InputCheckboxComponent = ({ id, checked = false, dis
         className="RampInputCheckbox--input"
         checked={checked}
         disabled={disabled}
-        onClick={() => {
-          onChange(!checked)
-          console.log(checked)
-        }}
+        onChange={() => onChange(!checked) }
       />
     </div>
   )
