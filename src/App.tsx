@@ -29,10 +29,20 @@ export function App() {
     setIsLoading(false)
   }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
 
+  /*Resolved Bug 3: All Employee: unable to render complete transactions list after filtering by employee.
+  - Set the condition of the 'if/else' statement to verify if the value of 'employeeId' is an empty string.
+    - If the condition evaluates to falsy then 'transactionsByEmployeeUtils' is invoked in the 'else' clause.
+  */ 
   const loadTransactionsByEmployee = useCallback(
     async (employeeId: string) => {
-      paginatedTransactionsUtils.invalidateData()
-      await transactionsByEmployeeUtils.fetchById(employeeId)
+      // if (employeeId === "" ) {
+        paginatedTransactionsUtils.invalidateData();
+      // } else {
+        console.log(employeeId)
+        await transactionsByEmployeeUtils.fetchById(employeeId);
+      // }
+      // console.log()
+
     },
     [paginatedTransactionsUtils, transactionsByEmployeeUtils]
   )
@@ -62,9 +72,9 @@ export function App() {
           })}
           onChange={async (newValue) => {
             if (newValue === null) {
-              return
+              return null
             }
-
+            
             await loadTransactionsByEmployee(newValue.id)
           }}
         />

@@ -16,5 +16,11 @@ export function useEmployees(): EmployeeResult {
     setEmployees(null)
   }, [])
 
+
+  // array of employee 'id', 'first' and 'last'.
+  // console.log(employees)
+
+  // console.log()
+
   return { data: employees, loading, fetchAll, invalidateData }
 }

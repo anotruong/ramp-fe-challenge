@@ -18,6 +18,8 @@ export function InputSelect<TItem>({
     left: 0,
   })
 
+  // console.log(items);
+
   const onChange = useCallback<InputSelectOnChange<TItem>>(
     (selectedItem) => {
       if (selectedItem === null) {

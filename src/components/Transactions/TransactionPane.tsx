@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { InputCheckbox } from "../InputCheckbox"
 import { TransactionPaneComponent } from "./types"
 
@@ -8,15 +8,7 @@ export const TransactionPane: TransactionPaneComponent = ({
   setTransactionApproval: consumerSetTransactionApproval,
 }) => {
   const [approved, setApproved] = useState(transaction.approved)
-
-  // const [setLoading] = useState(transaction.loading)
-  // console.log(`approved: ${approved}`)
-  // console.log(`loading: ${loading}`); //false that does not disable checkbox
-
-  // useEffect(()=> {
-  //   setApproved(!approved)
-  // }, [onChange])
-
+  
   return (
     <div className="RampPane">
       <div className="RampPane--content">
