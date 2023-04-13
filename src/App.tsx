@@ -9,7 +9,7 @@ import { EMPTY_EMPLOYEE } from "./utils/constants"
 import { Employee } from "./utils/types"
 
 export function App() {
-  const { data: employees, ...employeeUtils } = useEmployees()
+  let { data: employees, ...employeeUtils } = useEmployees()
   const { data: paginatedTransactions, ...paginatedTransactionsUtils } = usePaginatedTransactions()
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
   const [isLoading, setIsLoading] = useState(false)
@@ -30,27 +30,34 @@ export function App() {
   }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
 
   /*Resolved Bug 3: All Employee: unable to render complete transactions list after filtering by employee.
-  - Set the condition of the 'if/else' statement to verify if the value of 'employeeId' is an empty string.
-    - If the condition evaluates to falsy then 'transactionsByEmployeeUtils' is invoked in the 'else' clause.
+  - Discovery: In order to invoke the 'useEffect' for 'loadAllTransactions', two conditions must be met.
+    - Condition 1: The value of 'employees' must be reassigned to 'null'.
+    - Condition 2: When an empty string is passed in as an argument to 'transactionByEmployeeUtils.fetchById()', it should not throw an error.
+  
+  - Solution: Add an 'if/else' statement to 'loadedTransactionsByEmployee'. 
+    - If the value of 'employeeId' is an empty string, invoke the function 'loadAllTransactions'.
+    -Add 'loadAllTranactions' to depedency array.
   */ 
   const loadTransactionsByEmployee = useCallback(
     async (employeeId: string) => {
-      // if (employeeId === "" ) {
-        paginatedTransactionsUtils.invalidateData();
-      // } else {
-        console.log(employeeId)
-        await transactionsByEmployeeUtils.fetchById(employeeId);
-      // }
-      // console.log()
 
+      if (employeeId === "") {
+        loadAllTransactions()
+      } else {
+        paginatedTransactionsUtils.invalidateData();
+
+        await transactionsByEmployeeUtils.fetchById(employeeId);
+      }
     },
-    [paginatedTransactionsUtils, transactionsByEmployeeUtils]
+    [paginatedTransactionsUtils, transactionsByEmployeeUtils, loadAllTransactions]
   )
 
   useEffect(() => {
     if (employees === null && !employeeUtils.loading) {
+      console.log('reassignment works')
       loadAllTransactions()
     }
+    console.log('useEffect:' + employees)
   }, [employeeUtils.loading, employees, loadAllTransactions])
 
   return (
