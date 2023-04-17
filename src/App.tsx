@@ -9,15 +9,23 @@ import { EMPTY_EMPLOYEE } from "./utils/constants"
 import { Employee } from "./utils/types"
 
 export function App() {
-  let { data: employees, ...employeeUtils } = useEmployees()
+  // const [ pageObj, setPageObj ] = useState({})
+  const { data: employees, ...employeeUtils } = useEmployees()
   const { data: paginatedTransactions, ...paginatedTransactionsUtils } = usePaginatedTransactions()
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
   const [isLoading, setIsLoading] = useState(false)
 
+  // console.log(`paginatedTransactionsUtils ${paginatedTransactionsUtils.fetchAll()}`)
+
+  // '?.' operator returns 'undefined' if an object is undefined or null.
   const transactions = useMemo(
     () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
+    // console.log(paginatedTransactions?.data ?? transactionsByEmployee ?? null),
     [paginatedTransactions, transactionsByEmployee]
   )
+
+// console.log(transactions)
+
 
   const loadAllTransactions = useCallback(async () => {
     setIsLoading(true)
@@ -54,10 +62,8 @@ export function App() {
 
   useEffect(() => {
     if (employees === null && !employeeUtils.loading) {
-      console.log('reassignment works')
       loadAllTransactions()
     }
-    console.log('useEffect:' + employees)
   }, [employeeUtils.loading, employees, loadAllTransactions])
 
   return (
@@ -90,6 +96,9 @@ export function App() {
 
         <div className="RampGrid">
           <Transactions transactions={transactions} />
+
+          {/* Everytime the grid is filtered, the transactions are reloaded to the top.
+          */}
 
           {transactions !== null && (
             <button

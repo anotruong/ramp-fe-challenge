@@ -17,15 +17,11 @@ export const Transactions: TransactionsComponent = ({ transactions }) => {
     [fetchWithoutCache]
   )
 
-  // list of transactions displayed on the page.
-  // console.log(transactions) 
-
-  // console.log(fetchWithoutCache)
-
-
   if (transactions === null) {
     return <div className="RampLoading--container">Loading...</div>
   }
+
+  // console.log(transactions)
 
   return (
     <div data-testid="transaction-container">

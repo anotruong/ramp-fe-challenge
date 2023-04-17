@@ -5,7 +5,8 @@ import { useWrappedRequest } from "./useWrappedRequest"
 
 export function useCustomFetch() {
   const { cache } = useContext(AppContext)
-  const { loading, wrappedRequest } = useWrappedRequest()
+  const { loading, wrappedRequest } = useWrappedRequest();
+  // const testerObj = {};
 
   const fetchWithCache = useCallback(
     async <TData, TParams extends object = object>(
@@ -16,6 +17,7 @@ export function useCustomFetch() {
         const cacheKey = getCacheKey(endpoint, params)
         const cacheResponse = cache?.current.get(cacheKey)
 
+
         if (cacheResponse) {
           const data = JSON.parse(cacheResponse)
           return data as Promise<TData>
@@ -23,6 +25,8 @@ export function useCustomFetch() {
 
         const result = await fakeFetch<TData>(endpoint, params)
         cache?.current.set(cacheKey, JSON.stringify(result))
+
+        // console.log(result) //returns the three employee objects
         return result
       }),
     [cache, wrappedRequest]

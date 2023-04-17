@@ -14,9 +14,9 @@ export function useEmployees(): EmployeeResult {
   }, [fetchWithCache])
 
   const invalidateData = useCallback(() => {
-    console.log('employee.invalidate is working')
+    // console.log('employee.invalidate is working')
     setEmployees(null)
-    console.log(employees)
+    // console.log(employees)
   }, [])
 
   return { data: employees, loading, fetchAll, invalidateData }

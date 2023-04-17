@@ -17,6 +17,11 @@ const data: { employees: Employee[]; transactions: Transaction[] } = {
 
 export const getEmployees = (): Employee[] => data.employees
 
+/*Resolve Bug 4: View more bug. 
+
+  Solution: The bug is located at 'data.transactions.slice()' in 'data' property of the return statement. The value of 'page' is iterated with each invocation and in turn the value of 'state' is increased. By declaring a new constant 'startList' that is assigned to '0', the function 'getTransactionPaginated' returns a reference to an array of that stores both old and new tranactions when invoked. 
+*/
+
 export const getTransactionsPaginated = ({
   page,
 }: PaginatedRequestParams): PaginatedResponse<Transaction[]> => {
@@ -26,6 +31,7 @@ export const getTransactionsPaginated = ({
 
   const start = page * TRANSACTIONS_PER_PAGE
   const end = start + TRANSACTIONS_PER_PAGE
+  const listStart = 0;
 
   if (start > data.transactions.length) {
     throw new Error(`Invalid page ${page}`)
@@ -33,9 +39,11 @@ export const getTransactionsPaginated = ({
 
   const nextPage = end < data.transactions.length ? page + 1 : null
 
+   console.log(`page: ${page}, nextPage: ${nextPage}, state: ${start}, end: ${end}`)
+
   return {
     nextPage,
-    data: data.transactions.slice(start, end),
+    data: data.transactions.slice(listStart, end),
   }
 }
 
