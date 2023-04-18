@@ -9,7 +9,6 @@ import { EMPTY_EMPLOYEE } from "./utils/constants"
 import { Employee } from "./utils/types"
 
 export function App() {
-  // const [ pageObj, setPageObj ] = useState({})
   const { data: employees, ...employeeUtils } = useEmployees()
   const { data: paginatedTransactions, ...paginatedTransactionsUtils } = usePaginatedTransactions()
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
@@ -24,17 +23,21 @@ export function App() {
     [paginatedTransactions, transactionsByEmployee]
   )
 
-// console.log(transactions)
 
+  /* Resolved Bug 5: Employee Data not availabe during loading more data.
+
+    Solution: 'setIsLoading(false)' is invoked after the 'paginatedTransactiosnUtil.fetchAll()'. Invoking 'setIsLoading(false)' before 'paginatedTranactionsUntil.fetchAll()' will resolve the issue.
+  */
 
   const loadAllTransactions = useCallback(async () => {
     setIsLoading(true)
     transactionsByEmployeeUtils.invalidateData()
 
     await employeeUtils.fetchAll()
+    setIsLoading(false)
+
     await paginatedTransactionsUtils.fetchAll()
 
-    setIsLoading(false)
   }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
 
   /*Resolved Bug 3: All Employee: unable to render complete transactions list after filtering by employee.

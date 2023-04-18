@@ -21,16 +21,8 @@ export function usePaginatedTransactions(): PaginatedTransactionsResult {
       }
     )
 
-    // setTesterObj(() => {
-    //   if (response === null) {
-    //     response.data.forEach(())
-    //   }
-    // })
-
-
     setPaginatedTransactions((previousResponse) => {
       if (response === null || previousResponse === null) {
-        // console.log(typeof response)
         return response
       }
 
