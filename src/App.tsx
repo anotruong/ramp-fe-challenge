@@ -58,6 +58,7 @@ export function App() {
         paginatedTransactionsUtils.invalidateData();
 
         await transactionsByEmployeeUtils.fetchById(employeeId);
+
       }
     },
     [paginatedTransactionsUtils, transactionsByEmployeeUtils, loadAllTransactions]

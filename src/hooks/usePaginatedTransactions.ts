@@ -3,11 +3,8 @@ import { PaginatedRequestParams, PaginatedResponse, Transaction } from "../utils
 import { PaginatedTransactionsResult } from "./types"
 import { useCustomFetch } from "./useCustomFetch"
 
-// const dataObj = {};
-
 export function usePaginatedTransactions(): PaginatedTransactionsResult {
-  // const [testerObj, setTesterObj] = useState({});
-  const { fetchWithCache, loading } = useCustomFetch()
+  const { fetchWithCache, loading, setLoading } = useCustomFetch()
   const [paginatedTransactions, setPaginatedTransactions] = useState<PaginatedResponse<
     Transaction[]
   > | null>(null)
@@ -30,9 +27,14 @@ export function usePaginatedTransactions(): PaginatedTransactionsResult {
     })
   }, [fetchWithCache, paginatedTransactions])
 
+
+  /*Resolved Bug 6:  'View More' button should not be active when the transactions are filtered by employee.
+  
+  Solution: Import the function 'setLoading' from the hook 'UseCustomFetch'. Add 'setLoading' as a dependency to the callback of 'useCallback' passed in as an argument to the function 'invalidateData'. Invoke 'setLoading(true)' to 'invalidateData'.*/
   const invalidateData = useCallback(() => {
     setPaginatedTransactions(null)
-  }, [])
+    setLoading(true);
+  }, [setLoading])
 
   return { data: paginatedTransactions, loading, fetchAll, invalidateData }
 }

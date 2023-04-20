@@ -13,6 +13,7 @@ export function useWrappedRequest() {
         return result
       } catch (error) {
         setError(error as string)
+        // setLoading(true)
         return null
       } finally {
         setLoading(false)
@@ -21,5 +22,5 @@ export function useWrappedRequest() {
     [setError]
   )
 
-  return { loading, wrappedRequest }
+  return { loading, setLoading, wrappedRequest }
 }

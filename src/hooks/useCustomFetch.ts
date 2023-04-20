@@ -5,7 +5,7 @@ import { useWrappedRequest } from "./useWrappedRequest"
 
 export function useCustomFetch() {
   const { cache } = useContext(AppContext)
-  const { loading, wrappedRequest } = useWrappedRequest();
+  const { loading, setLoading, wrappedRequest } = useWrappedRequest();
   // const testerObj = {};
 
   const fetchWithCache = useCallback(
@@ -71,7 +71,7 @@ export function useCustomFetch() {
     [cache]
   )
 
-  return { fetchWithCache, fetchWithoutCache, clearCache, clearCacheByEndpoint, loading }
+  return { fetchWithCache, fetchWithoutCache, clearCache, clearCacheByEndpoint, loading, setLoading }
 }
 
 function getCacheKey(endpoint: RegisteredEndpoints, params?: object) {
