@@ -1,3 +1,4 @@
+// import { useCallback, useState } from "react"
 import {
   PaginatedRequestParams,
   PaginatedResponse,
@@ -17,13 +18,13 @@ const data: { employees: Employee[]; transactions: Transaction[] } = {
 
 export const getEmployees = (): Employee[] => data.employees
 
-/*Resolve Bug 4: View more bug. 
+/*Resolve Bug 4: 'View more' button. 
 
   Solution: The bug is located at 'data.transactions.slice()' in 'data' property of the return statement. The value of 'page' is iterated with each invocation and in turn the value of 'state' is increased. By declaring a new constant 'startList' that is assigned to '0', the function 'getTransactionPaginated' returns a reference to an array of that stores both old and new tranactions when invoked. 
 */
 
 export const getTransactionsPaginated = ({
-  page,
+  page
 }: PaginatedRequestParams): PaginatedResponse<Transaction[]> => {
   if (page === null) {
     throw new Error("Page cannot be null")
@@ -38,8 +39,6 @@ export const getTransactionsPaginated = ({
   }
 
   const nextPage = end < data.transactions.length ? page + 1 : null
-
-   console.log(`page: ${page}, nextPage: ${nextPage}, state: ${start}, end: ${end}`)
 
   return {
     nextPage,
@@ -65,4 +64,7 @@ export const setTransactionApproval = ({ transactionId, value }: SetTransactionA
   }
 
   transaction.approved = value
+
+  console.log(data)
+
 }

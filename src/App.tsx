@@ -14,15 +14,12 @@ export function App() {
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
   const [isLoading, setIsLoading] = useState(false)
 
-  // console.log(`paginatedTransactionsUtils ${paginatedTransactionsUtils.fetchAll()}`)
-
   // '?.' operator returns 'undefined' if an object is undefined or null.
   const transactions = useMemo(
-    () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
-    // console.log(paginatedTransactions?.data ?? transactionsByEmployee ?? null),
+    () => paginatedTransactions?.data ?? transactionsByEmployee,
+    // console.log(paginatedTransactions.data),
     [paginatedTransactions, transactionsByEmployee]
   )
-
 
   /* Resolved Bug 5: Employee Data not availabe during loading more data.
 
@@ -37,6 +34,7 @@ export function App() {
     setIsLoading(false)
 
     await paginatedTransactionsUtils.fetchAll()
+    // console.log(transactions)
 
   }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
 
@@ -58,6 +56,7 @@ export function App() {
         paginatedTransactionsUtils.invalidateData();
 
         await transactionsByEmployeeUtils.fetchById(employeeId);
+        // console.log(transactions)
 
       }
     },
@@ -77,6 +76,11 @@ export function App() {
 
         <hr className="RampBreak--l" />
 
+  
+  {/* Bug 7: 
+    Find where the informtion is being pulled from and send change back so the app persisteses the data.
+  */}
+
         <InputSelect<Employee>
           isLoading={isLoading}
           defaultValue={EMPTY_EMPLOYEE}
@@ -91,7 +95,6 @@ export function App() {
             if (newValue === null) {
               return null
             }
-            
             await loadTransactionsByEmployee(newValue.id)
           }}
         />
@@ -100,9 +103,6 @@ export function App() {
 
         <div className="RampGrid">
           <Transactions transactions={transactions} />
-
-          {/* Everytime the grid is filtered, the transactions are reloaded to the top.
-          */}
 
           {transactions !== null && (
             <button

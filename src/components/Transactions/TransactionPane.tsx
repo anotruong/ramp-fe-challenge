@@ -8,7 +8,8 @@ export const TransactionPane: TransactionPaneComponent = ({
   setTransactionApproval: consumerSetTransactionApproval,
 }) => {
   const [approved, setApproved] = useState(transaction.approved)
-  
+  // console.log(consumerSetTransactionApproval)
+
   return (
     <div className="RampPane">
       <div className="RampPane--content">
@@ -23,19 +24,21 @@ export const TransactionPane: TransactionPaneComponent = ({
         checked={approved}
         disabled={loading}
         onChange={async (newValue) => {
-          console.log(newValue)
 
-           await consumerSetTransactionApproval({
+          await consumerSetTransactionApproval({
             transactionId: transaction.id,
-            newValue,
+            newValue: approved,
           })
-           setApproved(newValue)
 
+          setApproved(newValue)
+
+           console.log(`this is ${approved}`)
         }}
       />
     </div>
   )
 }
+
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",

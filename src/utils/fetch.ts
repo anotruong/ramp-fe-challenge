@@ -53,7 +53,6 @@ export function fakeFetch<TData, TParams extends object = object>(
 
         case "setTransactionApproval":
           result = setTransactionApproval(params as SetTransactionApprovalParams) as unknown as TData
-
           setTimeout(() => {
             mockApiLogger({ data: { endpoint, params, result } })
             resolve(result)
@@ -89,8 +88,8 @@ function mockApiLogger({
     return
   }
 
-  console.log(`%c--Fake Request Debugger-- %c${message}`, "color: #717171", getTitleColor())
-  console.log(data)
+  // console.log(`%c--Fake Request Debugger-- %c${message}`, "color: #717171", getTitleColor())
+  // console.log(data)
 
   function getTitleColor() {
     if (type === "error") {

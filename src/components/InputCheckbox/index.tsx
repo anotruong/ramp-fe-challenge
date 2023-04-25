@@ -4,7 +4,7 @@ import { InputCheckboxComponent } from "./types"
 
 export const InputCheckbox: InputCheckboxComponent = ({ id, checked = false, disabled, onChange }) => {
   const { current: inputId } = useRef(`RampInputCheckbox-${id}`)
-  // console.log(`checked: ${checked}`)
+  // console.log(`checked: ${checked}`) // everytime a check is clicked, the entire list rerenders/
   // console.log(`disabled: ${disabled}`)
 
 

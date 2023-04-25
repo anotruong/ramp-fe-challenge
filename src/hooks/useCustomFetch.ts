@@ -6,7 +6,6 @@ import { useWrappedRequest } from "./useWrappedRequest"
 export function useCustomFetch() {
   const { cache } = useContext(AppContext)
   const { loading, setLoading, wrappedRequest } = useWrappedRequest();
-  // const testerObj = {};
 
   const fetchWithCache = useCallback(
     async <TData, TParams extends object = object>(
@@ -17,11 +16,12 @@ export function useCustomFetch() {
         const cacheKey = getCacheKey(endpoint, params)
         const cacheResponse = cache?.current.get(cacheKey)
 
-
         if (cacheResponse) {
           const data = JSON.parse(cacheResponse)
           return data as Promise<TData>
         }
+
+        console.log(cache)
 
         const result = await fakeFetch<TData>(endpoint, params)
         cache?.current.set(cacheKey, JSON.stringify(result))
@@ -39,8 +39,12 @@ export function useCustomFetch() {
     ): Promise<TData | null> =>
       wrappedRequest<TData>(async () => {
         const result = await fakeFetch<TData>(endpoint, params)
+        // console.log(params) // set transaction approval funnction
+
+        console.log(result)
         return result
       }),
+
     [wrappedRequest]
   )
 
