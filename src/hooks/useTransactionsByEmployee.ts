@@ -17,7 +17,7 @@ export function useTransactionsByEmployee(): TransactionsByEmployeeResult {
         }
       )
 
-      // console.log(data)
+      // console.log(data) //transactions by employee 
 
       setTransactionsByEmployee(data)
     },
