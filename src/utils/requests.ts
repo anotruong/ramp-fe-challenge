@@ -15,18 +15,23 @@ const data: { employees: Employee[]; transactions: Transaction[] } = {
   transactions: mockData.transactions,
 }
 
-localStorage.setItem('shallowCopy', JSON.stringify(data))
+// localStorage.setItem('data', JSON.stringify(data))
 
-const shallowCopy = localStorage.getItem('shallowCopy')
+// const getData = () => {
+//   const storedData = localStorage.getItem('data');
+//   if (storedData) {
+//     return JSON.parse(storedData);
+//   } else {
+//     const initialData = {
+//       employees: mockData.employees,
+//       transactions: mockData.transactions,
+//     };
+//     localStorage.setItem("data", JSON.stringify(initialData));
+//     return initialData;
+//   }
+// };
 
-const shallowCopyObj = shallowCopy ? JSON.parse(shallowCopy) : null
-
-const updateData = (newData: object) => {
-  // data = newData;
-  localStorage.setItem('shallowCopy', JSON.stringify(newData))
-}
-
-export const getEmployees = (): Employee[] => shallowCopyObj.employees
+export const getEmployees = (): Employee[] => data.employees
 
 /*Resolve Bug 4: 'View more' button. 
 
@@ -36,6 +41,9 @@ export const getEmployees = (): Employee[] => shallowCopyObj.employees
 export const getTransactionsPaginated = ({
   page
 }: PaginatedRequestParams): PaginatedResponse<Transaction[]> => {
+
+  // const data = getData();
+
   if (page === null) {
     throw new Error("Page cannot be null")
   }
@@ -44,44 +52,37 @@ export const getTransactionsPaginated = ({
   const end = start + TRANSACTIONS_PER_PAGE
   const listStart = 0;
 
-  if (start > shallowCopyObj.transactions.length) {
+  if (start > data.transactions.length) {
     throw new Error(`Invalid page ${page}`)
   }
 
-  const nextPage = end < shallowCopyObj.transactions.length ? page + 1 : null
+  const nextPage = end < data.transactions.length ? page + 1 : null
 
   return {
     nextPage,
-    data: shallowCopyObj.transactions.slice(listStart, end),
+    data: data.transactions.slice(listStart, end),
   }
 }
 
 export const getTransactionsByEmployee = ({ employeeId }: RequestByEmployeeParams) => {
+
   if (!employeeId) {
     throw new Error("Employee id cannot be empty")
   }
 
-  return shallowCopyObj.transactions.filter((transaction: any) => transaction.employee.id === employeeId)
+  return data.transactions.filter((transaction: any) => transaction.employee.id === employeeId)
 }
 
 export const setTransactionApproval = ({ transactionId, value }: SetTransactionApprovalParams): void => {
   
-  // const transaction = data.transactions.find(
-  //   (currentTransaction) => currentTransaction.id === transactionId
-  // )
-
-  const transaction = shallowCopyObj.transactions.find((currentTransaction: any) => currentTransaction.id === transactionId)
-
-  // shallowCopyObj.transactions.find((currentId) => currentId === transactionId)
+  const transaction = data.transactions.find(
+    (currentTransaction) => currentTransaction.id === transactionId
+  )
 
   if (!transaction) {
     throw new Error("Invalid transaction to approve")
   }
 
   transaction.approved = value
-
-  // console.log(shallowCopyObj)
-
-  updateData(shallowCopyObj)
   
 }
