@@ -15,22 +15,6 @@ const data: { employees: Employee[]; transactions: Transaction[] } = {
   transactions: mockData.transactions,
 }
 
-// localStorage.setItem('data', JSON.stringify(data))
-
-// const getData = () => {
-//   const storedData = localStorage.getItem('data');
-//   if (storedData) {
-//     return JSON.parse(storedData);
-//   } else {
-//     const initialData = {
-//       employees: mockData.employees,
-//       transactions: mockData.transactions,
-//     };
-//     localStorage.setItem("data", JSON.stringify(initialData));
-//     return initialData;
-//   }
-// };
-
 export const getEmployees = (): Employee[] => data.employees
 
 /*Resolve Bug 4: 'View more' button. 
@@ -41,8 +25,6 @@ export const getEmployees = (): Employee[] => data.employees
 export const getTransactionsPaginated = ({
   page
 }: PaginatedRequestParams): PaginatedResponse<Transaction[]> => {
-
-  // const data = getData();
 
   if (page === null) {
     throw new Error("Page cannot be null")
@@ -64,25 +46,29 @@ export const getTransactionsPaginated = ({
   }
 }
 
-export const getTransactionsByEmployee = ({ employeeId }: RequestByEmployeeParams) => {
-
+export const getTransactionsByEmployee = ({
+  employeeId,
+}: RequestByEmployeeParams) => {
   if (!employeeId) {
-    throw new Error("Employee id cannot be empty")
+    throw new Error("Employee id cannot be empty");
   }
 
-  return data.transactions.filter((transaction: any) => transaction.employee.id === employeeId)
-}
+  return data.transactions.filter(
+    (transaction) => transaction.employee.id === employeeId
+  );
+};
 
-export const setTransactionApproval = ({ transactionId, value }: SetTransactionApprovalParams): void => {
-  
+export const setTransactionApproval = ({
+  transactionId,
+  value,
+}: SetTransactionApprovalParams): void => {
   const transaction = data.transactions.find(
     (currentTransaction) => currentTransaction.id === transactionId
-  )
+  );
 
   if (!transaction) {
-    throw new Error("Invalid transaction to approve")
+    throw new Error("Invalid transaction to approve");
   }
 
-  transaction.approved = value
-  
-}
+  transaction.approved = value;
+};

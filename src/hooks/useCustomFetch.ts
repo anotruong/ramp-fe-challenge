@@ -21,8 +21,6 @@ export function useCustomFetch() {
           return data as Promise<TData>
         }
 
-        // console.log(cache)
-
         const result = await fakeFetch<TData>(endpoint, params)
         cache?.current.set(cacheKey, JSON.stringify(result))
 
@@ -39,9 +37,6 @@ export function useCustomFetch() {
     ): Promise<TData | null> =>
       wrappedRequest<TData>(async () => {
         const result = await fakeFetch<TData>(endpoint, params)
-        // console.log(params) // set transaction approval funnction
-
-        // console.log(result) //return transactions filtered by employee 
         return result
       }),
 
