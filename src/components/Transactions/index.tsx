@@ -5,22 +5,29 @@ import { TransactionPane } from "./TransactionPane"
 import { SetTransactionApprovalFunction, TransactionsComponent } from "./types"
 
 export const Transactions: TransactionsComponent = ({ transactions }) => {
-  const { fetchWithoutCache, loading, clearCache } = useCustomFetch()
+  const { fetchWithoutCache, loading, clearCacheByEndpoint, clearCache } = useCustomFetch()
 
   const setTransactionApproval = useCallback<SetTransactionApprovalFunction>(
     async ({ transactionId, newValue }) => {
-      clearCache()
-      await fetchWithoutCache<void, SetTransactionApprovalParams>("setTransactionApproval", {
-        transactionId,
-        value: newValue,
-      })
+
+      // clearCache()
       
+      await fetchWithoutCache<void, SetTransactionApprovalParams>(
+        "setTransactionApproval",
+        {
+          transactionId,
+          value: newValue,
+        }
+      );
+
+      // clear cacheded data for paginatedTransactions and transactionsByEmployee only
+      // clearCacheByEndpoint(["paginatedTransactions", "transactionsByEmployee"]);
     },
-    [fetchWithoutCache, clearCache]
-  )
+    [fetchWithoutCache]
+  );
 
   if (transactions === null) {
-    return <div className="RampLoading--container">Loading...</div>
+    return <div className="RampLoading--container">Loading...</div>;
   }
 
   return (

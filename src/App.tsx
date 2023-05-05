@@ -14,10 +14,9 @@ export function App() {
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
   const [isLoading, setIsLoading] = useState(false)
 
-  // '?.' operator returns 'undefined' if an object is undefined or null.
+  // // '?.' operator returns 'undefined' if an object is undefined or null.
   const transactions = useMemo(
     () => paginatedTransactions?.data ?? transactionsByEmployee,
-    // console.log(paginatedTransactions.data),
     [paginatedTransactions, transactionsByEmployee]
   )
 
@@ -34,33 +33,23 @@ export function App() {
     setIsLoading(false)
 
     await paginatedTransactionsUtils.fetchAll()
-    // console.log(transactions)
-
   }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
 
-  /*Resolved Bug 3: All Employee: unable to render complete transactions list after filtering by employee.
-  - Discovery: In order to invoke the 'useEffect' for 'loadAllTransactions', two conditions must be met.
-    - Condition 1: The value of 'employees' must be reassigned to 'null'.
-    - Condition 2: When an empty string is passed in as an argument to 'transactionByEmployeeUtils.fetchById()', it should not throw an error.
-  
-  - Solution: Add an 'if/else' statement to 'loadedTransactionsByEmployee'. 
-    - If the value of 'employeeId' is an empty string, invoke the function 'loadAllTransactions'.
-    -Add 'loadAllTranactions' to depedency array.
-  */ 
+
   const loadTransactionsByEmployee = useCallback(
     async (employeeId: string) => {
 
-      if (employeeId === "") {
-        loadAllTransactions()
-      } else {
+      // if (employeeId === "") {
+      //   loadAllTransactions()
+      // } else {
         paginatedTransactionsUtils.invalidateData();
 
         await transactionsByEmployeeUtils.fetchById(employeeId);
         // console.log(transactions)
 
-      }
+      // }
     },
-    [paginatedTransactionsUtils, transactionsByEmployeeUtils, loadAllTransactions]
+    [paginatedTransactionsUtils, transactionsByEmployeeUtils]
   )
 
   useEffect(() => {
@@ -76,11 +65,8 @@ export function App() {
 
         <hr className="RampBreak--l" />
 
-  
-  {/* Bug 7: 
-    Find where the informtion is being pulled from and send change back so the app persisteses the data.
-  */}
-
+      {/*Resolved Bug 3: Use a terenary statement to evaluate if `newValue.id` strictly equals to an empty string. If it does then `loadAllTransactions` is invoked and if it evaulates falsy then `loadTransactionsByEmployee` is invoked.
+      */}
         <InputSelect<Employee>
           isLoading={isLoading}
           defaultValue={EMPTY_EMPLOYEE}
@@ -93,10 +79,16 @@ export function App() {
           })}
           onChange={async (newValue) => {
             if (newValue === null) {
-              return null
+              return
             }
-            await loadTransactionsByEmployee(newValue.id)
-          }}
+
+            newValue.id === "" ? await loadAllTransactions() : await loadTransactionsByEmployee(newValue.id)
+
+            // if (newValue.id === "") {
+            //   await loadAllTransactions()
+            // } else {}
+            // await loadTransactionsByEmployee(newValue.id)
+          }} 
         />
 
         <div className="RampBreak--l" />

@@ -33,7 +33,9 @@ export function usePaginatedTransactions(): PaginatedTransactionsResult {
   const invalidateData = useCallback(() => {
     setPaginatedTransactions(null)
     setLoading(true);
-  }, [setLoading])
+  }, [
+    setLoading
+  ])
 
   return { data: paginatedTransactions, loading, fetchAll, invalidateData }
 }

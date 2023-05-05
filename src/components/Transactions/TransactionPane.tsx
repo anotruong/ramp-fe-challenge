@@ -1,6 +1,7 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { InputCheckbox } from "../InputCheckbox"
 import { TransactionPaneComponent } from "./types"
+import { AppContext } from "src/utils/context"
 
 export const TransactionPane: TransactionPaneComponent = ({
   transaction,
@@ -8,6 +9,7 @@ export const TransactionPane: TransactionPaneComponent = ({
   setTransactionApproval: consumerSetTransactionApproval,
 }) => {
   const [approved, setApproved] = useState(transaction.approved)
+  // const { cache } = useContext(AppContext)
   // console.log(consumerSetTransactionApproval)
 
   return (
@@ -31,8 +33,6 @@ export const TransactionPane: TransactionPaneComponent = ({
           })
 
           setApproved(newValue)
-
-           console.log(`this is ${approved}`)
         }}
       />
     </div>
