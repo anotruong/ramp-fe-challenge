@@ -1,62 +1,63 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react"
-import { InputSelect } from "./components/InputSelect"
-import { Instructions } from "./components/Instructions"
-import { Transactions } from "./components/Transactions"
-import { useEmployees } from "./hooks/useEmployees"
-import { usePaginatedTransactions } from "./hooks/usePaginatedTransactions"
-import { useTransactionsByEmployee } from "./hooks/useTransactionsByEmployee"
-import { EMPTY_EMPLOYEE } from "./utils/constants"
-import { Employee } from "./utils/types"
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { InputSelect } from "./components/InputSelect";
+import { Instructions } from "./components/Instructions";
+import { Transactions } from "./components/Transactions";
+import { useEmployees } from "./hooks/useEmployees";
+import { usePaginatedTransactions } from "./hooks/usePaginatedTransactions";
+import { useTransactionsByEmployee } from "./hooks/useTransactionsByEmployee";
+import { EMPTY_EMPLOYEE } from "./utils/constants";
+import { Employee } from "./utils/types";
 
 export function App() {
-  const { data: employees, ...employeeUtils } = useEmployees()
-  const { data: paginatedTransactions, ...paginatedTransactionsUtils } = usePaginatedTransactions()
-  const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
-  const [isLoading, setIsLoading] = useState(false)
+  const { data: employees, ...employeeUtils } = useEmployees();
+  const { data: paginatedTransactions, ...paginatedTransactionsUtils } =
+    usePaginatedTransactions();
+  const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } =
+    useTransactionsByEmployee();
+  const [isLoading, setIsLoading] = useState(false);
 
-  // // '?.' operator returns 'undefined' if an object is undefined or null.
+  /* bug-6 fix: added variable to track whether the transactions
+   are filtered by employee or not. This is used to conditionally render the
+   button on line 100. This value is toggled false in the loadAllTransactions
+   function and toggled true in the loadTransactionsByEmployee function. */
+  const [isFilteredByEmployee, setIsFilteredByEmployee] = useState(false);
+
   const transactions = useMemo(
-    () => paginatedTransactions?.data ?? transactionsByEmployee,
+    () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
     [paginatedTransactions, transactionsByEmployee]
-  )
-
-  /* Resolved Bug 5: Employee Data not availabe during loading more data.
-
-    Solution: 'setIsLoading(false)' is invoked after the 'paginatedTransactiosnUtil.fetchAll()'. Invoking 'setIsLoading(false)' before 'paginatedTranactionsUntil.fetchAll()' will resolve the issue.
-  */
+  );
 
   const loadAllTransactions = useCallback(async () => {
-    setIsLoading(true)
-    transactionsByEmployeeUtils.invalidateData()
+    setIsLoading(true);
+    transactionsByEmployeeUtils.invalidateData();
 
-    await employeeUtils.fetchAll()
-    setIsLoading(false)
+    /* bug-6 fix: set isFilteredByEmployee to false */
+    setIsFilteredByEmployee(false);
 
-    await paginatedTransactionsUtils.fetchAll()
-  }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
+    await employeeUtils.fetchAll();
+    /* bug-5 fix: move setIsLoading invocation to before
+    the fetchAll() for paginatedTransactionsUtils */
+    setIsLoading(false);
 
+    await paginatedTransactionsUtils.fetchAll();
+  }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils]);
 
   const loadTransactionsByEmployee = useCallback(
     async (employeeId: string) => {
+      paginatedTransactionsUtils.invalidateData();
 
-      // if (employeeId === "") {
-      //   loadAllTransactions()
-      // } else {
-        paginatedTransactionsUtils.invalidateData();
-
-        await transactionsByEmployeeUtils.fetchById(employeeId);
-        // console.log(transactions)
-
-      // }
+      /* bug-6 fix: set isFilteredByEmployee to true */
+      setIsFilteredByEmployee(true);
+      await transactionsByEmployeeUtils.fetchById(employeeId);
     },
     [paginatedTransactionsUtils, transactionsByEmployeeUtils]
-  )
+  );
 
   useEffect(() => {
     if (employees === null && !employeeUtils.loading) {
-      loadAllTransactions()
+      loadAllTransactions();
     }
-  }, [employeeUtils.loading, employees, loadAllTransactions])
+  }, [employeeUtils.loading, employees, loadAllTransactions]);
 
   return (
     <Fragment>
@@ -65,8 +66,6 @@ export function App() {
 
         <hr className="RampBreak--l" />
 
-      {/*Resolved Bug 3: Use a terenary statement to evaluate if `newValue.id` strictly equals to an empty string. If it does then `loadAllTransactions` is invoked and if it evaulates falsy then `loadTransactionsByEmployee` is invoked.
-      */}
         <InputSelect<Employee>
           isLoading={isLoading}
           defaultValue={EMPTY_EMPLOYEE}
@@ -79,16 +78,15 @@ export function App() {
           })}
           onChange={async (newValue) => {
             if (newValue === null) {
-              return
+              return;
+            } else if (newValue.id === "") {
+              /* bug-3 fix: additional conditional to account for the empty id value
+            on the EMPTY_EMPLOYEE constant */
+              await loadAllTransactions();
+              return;
             }
-
-            newValue.id === "" ? await loadAllTransactions() : await loadTransactionsByEmployee(newValue.id)
-
-            // if (newValue.id === "") {
-            //   await loadAllTransactions()
-            // } else {}
-            // await loadTransactionsByEmployee(newValue.id)
-          }} 
+            await loadTransactionsByEmployee(newValue.id);
+          }}
         />
 
         <div className="RampBreak--l" />
@@ -96,19 +94,23 @@ export function App() {
         <div className="RampGrid">
           <Transactions transactions={transactions} />
 
-          {transactions !== null && (
-            <button
-              className="RampButton"
-              disabled={paginatedTransactionsUtils.loading}
-              onClick={async () => {
-                await loadAllTransactions()
-              }}
-            >
-              View More
-            </button>
-          )}
+          {/* bug-6 fix: conditionally render the button based on whether the isFilteredByEmployee
+           variable is true, and whether there's a next page to make a request to. */}
+          {transactions !== null &&
+            !isFilteredByEmployee &&
+            paginatedTransactions?.nextPage !== null && (
+              <button
+                className="RampButton"
+                disabled={paginatedTransactionsUtils.loading}
+                onClick={async () => {
+                  await loadAllTransactions();
+                }}
+              >
+                View More
+              </button>
+            )}
         </div>
       </main>
     </Fragment>
-  )
+  );
 }

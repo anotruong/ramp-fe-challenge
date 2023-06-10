@@ -5,12 +5,10 @@ import { TransactionPane } from "./TransactionPane"
 import { SetTransactionApprovalFunction, TransactionsComponent } from "./types"
 
 export const Transactions: TransactionsComponent = ({ transactions }) => {
-  const { fetchWithoutCache, loading, clearCacheByEndpoint, clearCache } = useCustomFetch()
+  const { fetchWithoutCache, loading, clearCacheByEndpoint } = useCustomFetch()
 
   const setTransactionApproval = useCallback<SetTransactionApprovalFunction>(
     async ({ transactionId, newValue }) => {
-
-      // clearCache()
       
       await fetchWithoutCache<void, SetTransactionApprovalParams>(
         "setTransactionApproval",
@@ -20,10 +18,9 @@ export const Transactions: TransactionsComponent = ({ transactions }) => {
         }
       );
 
-      // clear cacheded data for paginatedTransactions and transactionsByEmployee only
-      // clearCacheByEndpoint(["paginatedTransactions", "transactionsByEmployee"]);
-    },
-    [fetchWithoutCache]
+      clearCacheByEndpoint(["paginatedTransactions", "transactionsByEmployee"]);
+   },
+    [fetchWithoutCache, clearCacheByEndpoint]
   );
 
   if (transactions === null) {

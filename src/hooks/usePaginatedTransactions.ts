@@ -1,41 +1,41 @@
-import { useCallback, useState } from "react"
-import { PaginatedRequestParams, PaginatedResponse, Transaction } from "../utils/types"
-import { PaginatedTransactionsResult } from "./types"
-import { useCustomFetch } from "./useCustomFetch"
+import { useCallback, useState } from "react";
+import {
+  PaginatedRequestParams,
+  PaginatedResponse,
+  Transaction,
+} from "../utils/types";
+import { PaginatedTransactionsResult } from "./types";
+import { useCustomFetch } from "./useCustomFetch";
 
 export function usePaginatedTransactions(): PaginatedTransactionsResult {
-  const { fetchWithCache, loading, setLoading } = useCustomFetch()
-  const [paginatedTransactions, setPaginatedTransactions] = useState<PaginatedResponse<
-    Transaction[]
-  > | null>(null)
-  const fetchAll = useCallback(async () => {
+  const { fetchWithCache, loading } = useCustomFetch();
+  const [paginatedTransactions, setPaginatedTransactions] =
+    useState<PaginatedResponse<Transaction[]> | null>(null);
 
-    const response = await fetchWithCache<PaginatedResponse<Transaction[]>, PaginatedRequestParams>(
-      "paginatedTransactions",
-      {
-        page: paginatedTransactions === null ? 0 : paginatedTransactions.nextPage,
-      }
-    )
+  const fetchAll = useCallback(async () => {
+    const response = await fetchWithCache<
+      PaginatedResponse<Transaction[]>,
+      PaginatedRequestParams
+    >("paginatedTransactions", {
+      page: paginatedTransactions === null ? 0 : paginatedTransactions.nextPage,
+    });
 
     setPaginatedTransactions((previousResponse) => {
       if (response === null || previousResponse === null) {
-        return response
+        return response;
       }
+      /* bug-4 fix: return an array for data, including both ...previousResponse.data 
+      and ...response.data, rather than only returning ...response.data */
+      return {
+        data: [...previousResponse.data, ...response.data],
+        nextPage: response.nextPage,
+      };
+    });
+  }, [fetchWithCache, paginatedTransactions]);
 
-      return { data: response.data, nextPage: response.nextPage }
-    })
-  }, [fetchWithCache, paginatedTransactions])
-
-
-  /*Resolved Bug 6:  'View More' button should not be active when the transactions are filtered by employee.
-  
-  Solution: Import the function 'setLoading' from the hook 'UseCustomFetch'. Add 'setLoading' as a dependency to the callback of 'useCallback' passed in as an argument to the function 'invalidateData'. Invoke 'setLoading(true)' to 'invalidateData'.*/
   const invalidateData = useCallback(() => {
-    setPaginatedTransactions(null)
-    setLoading(true);
-  }, [
-    setLoading
-  ])
+    setPaginatedTransactions(null);
+  }, []);
 
-  return { data: paginatedTransactions, loading, fetchAll, invalidateData }
+  return { data: paginatedTransactions, loading, fetchAll, invalidateData };
 }
